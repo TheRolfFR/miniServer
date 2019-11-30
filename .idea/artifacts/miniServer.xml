@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="miniServer">
+    <output-path>$PROJECT_DIR$/out/artifacts/miniServer</output-path>
+    <root id="archive" name="miniServer.jar">
+      <element id="directory" name="com">
+        <element id="dir-copy" path="$PROJECT_DIR$/out/production/MiniServer/com" />
+      </element>
+    </root>
+  </artifact>
+</component>
