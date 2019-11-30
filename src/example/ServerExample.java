@@ -1,0 +1,29 @@
+package example;
+
+import com.therolf.miniServer.Server;
+
+public class ServerExample {
+    public static final int PORT = 1777;
+
+    public ServerExample() {
+        Server miniServer = new Server(PORT, "serverExample");
+        miniServer.setMessageListener((fromPseudo, message) -> {
+            switch (message) {
+                case "hello":
+                    miniServer.sendToEveryoneElse(fromPseudo, fromPseudo + "says hello");
+                    break;
+                case "list":
+                    miniServer.sendFromTo(fromPseudo, fromPseudo, miniServer.getAllPseudos());
+                    break;
+                default:
+                    miniServer.sendToEveryoneElse(fromPseudo, message);
+                    break;
+            }
+        });
+        miniServer.run();
+    }
+
+    public static void main(String[] args) {
+        new ServerExample();
+    }
+}
