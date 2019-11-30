@@ -1,9 +1,12 @@
 package com.therolf.miniServer;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -38,7 +41,8 @@ public class Server {
         try {
             System.out.println("=== Starting server ===");
             ServerSocket servSocket = new ServerSocket(port, 100, InetAddress.getByName("127.0.0.1"));
-            System.out.println("=== Started server on port " + port + " ===");
+            System.out.println("=== Started server at " + servSocket.getInetAddress().getHostAddress() + ":" + port + " ===");
+            System.out.println("=== Online address (if ports are opened) : " + getOnlineAddress() + ":" + port + " ===");
 
             //noinspection InfiniteLoopStatement
             while(true) {
@@ -50,6 +54,34 @@ public class Server {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private String getOnlineAddress() {
+        String result;
+        try
+        {
+            URL url_name = new URL("http://bot.whatismyipaddress.com");
+            BufferedReader sc = new BufferedReader(new InputStreamReader(url_name.openStream()));
+            result = sc.readLine().trim();
+            if (!(result.length() > 0))
+            {
+                try
+                {
+                    InetAddress localhost = InetAddress.getLocalHost();
+                    System.out.println((localhost.getHostAddress()).trim());
+                    result = (localhost.getHostAddress()).trim();
+                }
+                catch(Exception e1)
+                {
+                    result = "Cannot Execute Properly";
+                }
+            }
+        }
+        catch (Exception e2)
+        {
+            result = "Cannot Execute Properly";
+        }
+        return result;
     }
 
     public boolean pseudoExists(String pseudoToTest) {

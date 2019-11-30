@@ -18,10 +18,11 @@ public class ClientExample {
 
         // starting program
         System.out.println("=== Mini Client example ===");
-        /*System.out.println("Please enter ip address:");
+        String ip = ""; // = ""
+        System.out.println("Please enter ip address:");
         if(sc.hasNextLine())
-            str = sc.nextLine();*/
-        String ip = "127.0.0.1";
+            ip = sc.nextLine();
+//        ip = "127.0.0.1";
         int port = ServerExample.PORT;
 
         // trying to connect

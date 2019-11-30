@@ -15,6 +15,9 @@ public class ServerExample {
                 case "list":
                     miniServer.sendFromTo(miniServer.getServerName(), fromPseudo, miniServer.getAllPseudos());
                     break;
+                case "ping":
+                    miniServer.sendFromTo(miniServer.getServerName(), fromPseudo, "pong");
+                    break;
                 default:
                     miniServer.sendToEveryone(fromPseudo, message);
                     break;
