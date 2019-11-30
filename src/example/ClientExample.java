@@ -27,16 +27,14 @@ public class ClientExample {
             System.out.println("Please Login with your pseudo: ");
 
             // auth
-            while(!client.isAuthed()) {
-                System.out.println(client.isAuthed());
-                while(sc.hasNextLine()) {
-                    str = sc.nextLine();
-                    client.send(str);
-                    System.out.println(client.read().getMessage());
-                }
+            while(!client.isAuthed() && sc.hasNextLine()) {
+                str = sc.nextLine();
+                client.send(str);
+                System.out.println(client.read().getMessage());
             }
-
             System.out.println("=== Successfully logged in as " + str + " ===");
+            Thread thread = new Thread(client);
+            thread.start();
 
             // make a message listener
             client.setMessageListener((pseudo, message) -> System.out.println(pseudo + ": " + message));
@@ -49,6 +47,7 @@ public class ClientExample {
             }
 
             // close client
+            thread.interrupt();
             client.close();
         } catch (IOException e) {
             e.printStackTrace();

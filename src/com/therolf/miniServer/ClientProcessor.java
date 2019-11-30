@@ -28,54 +28,47 @@ public class ClientProcessor implements Runnable {
 
     @Override
     public void run() {
+        System.out.println("new connection");
         try {
-            System.out.println("new connection");
 
             // start writer and reader
             pw = new PrintWriter(socket.getOutputStream(), true);
             br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-            while (!socket.isClosed()) {
+            while (!(Thread.currentThread().isInterrupted() || socket.isClosed())) {
                 System.out.println("socket opened");
-                try {
-                    if(br != null && br.ready()) {
-                        String input = read();
+                if(br != null && br.ready()) {
+                    String input = read();
 
-                        // if user is not authed
-                        if(pseudo == null) {
-                            // if pseudo exist
-                            if(server.pseudoExists(input)) {
-                                // notify with error
-                                send(server.getServerName(), AUTH_FAILED_RESPONSE);
-                            } else{
-                                //change pseudo
-                                pseudo = input;
-                                send(server.getServerName(), AUTH_COMPLETE_RESPONSE + pseudo);
-                                System.out.println("connection successful with " + pseudo);
-                            }
-                        } else {
-                            // the user is authed
-                            // decode its message
+                    // if user is not authed
+                    if(pseudo == null) {
+                        // if pseudo exist
+                        if(server.pseudoExists(input)) {
+                            // notify with error
+                            send(server.getServerName(), AUTH_FAILED_RESPONSE);
+                        } else{
+                            //change pseudo
+                            pseudo = input;
+                            send(server.getServerName(), AUTH_COMPLETE_RESPONSE + pseudo);
+                            System.out.println("connection successful with " + pseudo);
+                        }
+                    } else {
+                        // the user is authed
+                        // decode its message
 
-                            Message m = Message.fromString(input);
+                        Message m = Message.fromString(input);
 
-                            if(server.messageListener != null) {
-                                server.messageListener.onMessageReceived(m.getPseudo(), m.getMessage());
-                            }
+                        if(server.messageListener != null) {
+                            server.messageListener.onMessageReceived(m.getPseudo(), m.getMessage());
                         }
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
             }
-
-            // end of connection
-            System.out.println("end of connection");
-            server.removeClient(ClientProcessor.this);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
+        System.out.println("end of connection");
         server.removeClient(ClientProcessor.this);
     }
 

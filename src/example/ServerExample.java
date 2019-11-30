@@ -8,7 +8,6 @@ public class ServerExample {
     public ServerExample() {
         Server miniServer = new Server(PORT, "serverExample");
         miniServer.setMessageListener((fromPseudo, message) -> {
-            System.out.println("new message received: " + message + fromPseudo);
             switch (message) {
                 case "hello":
                     miniServer.sendToEveryoneElse(fromPseudo, fromPseudo + " says hello");

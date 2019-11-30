@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-public class Client {
+public class Client implements Runnable {
 
     private BufferedReader br;
     private PrintWriter pw;
@@ -14,31 +14,15 @@ public class Client {
     private Socket socket;
     private boolean isAuthed = false;
     private String pseudo;
-    private Thread thread;
 
     public Client(String ip, int port) throws IOException {
-//        Scanner sc = new Scanner(System.in);
-
         socket = new Socket(ip, port);
         br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         pw = new PrintWriter(socket.getOutputStream(), true);
+    }
 
-        // create thread for reception
-        thread = new Thread(() -> {
-            while (!socket.isClosed()) {
-                try {
-                    if(br.ready()) {
-                        Message m = read();
-                        if(messageListener != null) {
-                            messageListener.onMessageReceived(m.getPseudo(), m.getMessage());
-                        }
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        thread.start();
+    public boolean isClosed() {
+        return socket == null || socket.isClosed();
     }
 
     public void send(String string) {
@@ -74,11 +58,18 @@ public class Client {
     }
 
     public void close() {
-        System.out.println("closing");
-        if(socket != null) {
+        if(pw != null)
             pw.close();
+        if(br != null) {
             try {
                 br.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if(socket != null) {
+            try {
                 socket.close();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -86,7 +77,22 @@ public class Client {
         }
     }
 
-    public boolean isClosed() {
-        return socket.isClosed();
+    @Override
+    public void run() {
+        try {
+            while (!(Thread.currentThread().isInterrupted() || socket.isClosed())) {
+                if (br.ready()) {
+                    Message m = Client.this.read();
+                    if (messageListener != null) {
+                        messageListener.onMessageReceived(m.getPseudo(), m.getMessage());
+                    }
+                }
+            }
+
+            System.out.println("closing thread and socket");
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
