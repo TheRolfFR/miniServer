@@ -81,6 +81,10 @@ public class Server {
         return found;
     }
 
+    public int getOpenSessions() {
+        return clientProcessors.size();
+    }
+
     public String getAllPseudos() {
         ArrayList<String> pseudos = new ArrayList<>();
         for(ClientProcessor gscp : clientProcessors) {

@@ -29,11 +29,6 @@ public class ClientExample {
         try {
             client = new Client(ip, port);
 
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                client.send(Server.SHUTDOWN_COMMAND);
-                System.out.println("The client is shut down!");
-            }));
-
             System.out.println("Please Login with your pseudo: ");
 
             // auth
@@ -45,24 +40,19 @@ public class ClientExample {
             System.out.println("=== Successfully logged in as " + str + " ===");
 
             // send messages
-            Thread t = new Thread(() -> {
+            new Thread(() -> {
                 while(client.isRunning()) {
                     if(sc.hasNextLine())
-                        client.send(sc.nextLine());
+                    {
+                        String line = sc.nextLine();
+                        if(line.equals("bye")) {
+                            client.send(Server.SHUTDOWN_COMMAND);
+                        } else {
+                            client.send(line);
+                        }
+                    }
                 }
-            });
-            t.start();
-
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                try {
-                    client.send(Server.SHUTDOWN_COMMAND);
-                    t.interrupt();
-                    t.join();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                System.out.println("The client is shut down!");
-            }));
+            }).start();
 
             // receive messages
             while(client.isRunning()) {
@@ -72,7 +62,6 @@ public class ClientExample {
                 }
             }
 
-            System.out.println("finishing");
             //properly close client
             if(!client.isClosed())
                 client.close();

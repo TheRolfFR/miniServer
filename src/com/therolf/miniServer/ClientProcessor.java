@@ -40,12 +40,9 @@ public class ClientProcessor implements Runnable {
                 if(br != null && br.ready()) {
                     String input = read();
 
-                    System.out.println(input);
-                    if(input.equals(Server.SHUTDOWN_COMMAND))
+                    if(input.equals(Server.SHUTDOWN_COMMAND)) {
                         socket.close();
-
-                    // if user is not authed
-                    if(pseudo == null) {
+                    } else if(pseudo == null) {
                         // if pseudo exist
                         if(server.pseudoExists(input)) {
                             // notify with error
@@ -70,8 +67,10 @@ public class ClientProcessor implements Runnable {
             e.printStackTrace();
         }
 
-        System.out.println("end of connection");
+        System.out.print("end of connection");
+        System.out.println((pseudo != null) ? " with " + pseudo : "");
         server.removeClient(ClientProcessor.this);
+        System.out.println(server.getOpenSessions() + " open sessions left");
     }
 
     static ClientProcessor addNewProcessor(Socket socket, Server server) {

@@ -19,6 +19,11 @@ public class Client {
         this.socket = new Socket(ip, port);
         this.br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         this.pw = new PrintWriter(socket.getOutputStream(), true);
+
+        /*
+        TRUC MEGA IMPORTANT NE PAS SUPPRIMER
+         */
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> this.send(Server.SHUTDOWN_COMMAND)));
     }
     public void send(String string) {
         if(pw != null) {
@@ -73,6 +78,8 @@ public class Client {
             }
         }
     }
+    
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isClosed() {
         return socket.isClosed();
     }
