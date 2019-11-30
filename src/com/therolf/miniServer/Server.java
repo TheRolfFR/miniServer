@@ -117,6 +117,10 @@ public class Server {
         }
     }
 
+    void removeClient(ClientProcessor clientProcessor) {
+        clientProcessors.remove(clientProcessor);
+    }
+
     public interface MessageListener {
         void onMessageReceived(String pseudo, String message);
     }

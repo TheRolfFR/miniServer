@@ -10,9 +10,9 @@ public class ClientProcessor implements Runnable {
 
     static final String AUTH_COMPLETE_RESPONSE = "Welcome ";
     private static final String AUTH_FAILED_RESPONSE = "Auth failed. Please choose another pseudo.";
-    private static final String MESSAGE_SEPARATOR = " | ";
 
     private Socket socket;
+    private Server server;
     private PrintWriter pw;
     private BufferedReader br;
     private String pseudo;
@@ -23,11 +23,22 @@ public class ClientProcessor implements Runnable {
 
     private ClientProcessor(Socket socket, Server server) {
         this.socket = socket;
+        this.server = server;
+    }
 
-        new Thread(() -> {
+    @Override
+    public void run() {
+        try {
+            System.out.println("new connection");
+
+            // start writer and reader
+            pw = new PrintWriter(socket.getOutputStream(), true);
+            br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
             while (!socket.isClosed()) {
+                System.out.println("socket opened");
                 try {
-                    if(br.ready()) {
+                    if(br != null && br.ready()) {
                         String input = read();
 
                         // if user is not authed
@@ -40,27 +51,32 @@ public class ClientProcessor implements Runnable {
                                 //change pseudo
                                 pseudo = input;
                                 send(server.getServerName(), AUTH_COMPLETE_RESPONSE + pseudo);
+                                System.out.println("connection successful with " + pseudo);
                             }
                         } else {
                             // the user is authed
                             // decode its message
 
-                            int separatorIndex = input.indexOf(MESSAGE_SEPARATOR);
-                            String pseudo = "unknown";
-                            String message = input;
-                            if(separatorIndex > -1) {
-                                pseudo = input.substring(0, separatorIndex);
-                                message = input.substring(separatorIndex);
-                            }
+                            Message m = Message.fromString(input);
 
                             if(server.messageListener != null) {
-                                server.messageListener.onMessageReceived(pseudo, message);
+                                server.messageListener.onMessageReceived(m.getPseudo(), m.getMessage());
                             }
                         }
                     }
-                } catch (IOException ignored) {}
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-        }).start();
+
+            // end of connection
+            System.out.println("end of connection");
+            server.removeClient(ClientProcessor.this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        server.removeClient(ClientProcessor.this);
     }
 
     static ClientProcessor addNewProcessor(Socket socket, Server server) {
@@ -71,25 +87,12 @@ public class ClientProcessor implements Runnable {
 
     public void send(String fromPseudo, String message) {
         if(pw != null)
-            pw.println(fromPseudo + MESSAGE_SEPARATOR + message);
-    }
-
-    @Override
-    public void run() {
-        try {
-            System.out.println("new connection");
-
-            // start writer and reader
-            pw = new PrintWriter(socket.getOutputStream(), true);
-            br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            pw.println(Message.toString(fromPseudo, message));
     }
 
     public void sendIfAuthed(String fromPseudo, String string) {
         if(this.pseudo != null)
-            send(fromPseudo, string);
+            this.send(fromPseudo, string);
     }
 
     private String read() throws IOException {

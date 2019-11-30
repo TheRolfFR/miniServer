@@ -8,15 +8,16 @@ public class ServerExample {
     public ServerExample() {
         Server miniServer = new Server(PORT, "serverExample");
         miniServer.setMessageListener((fromPseudo, message) -> {
+            System.out.println("new message received: " + message + fromPseudo);
             switch (message) {
                 case "hello":
-                    miniServer.sendToEveryoneElse(fromPseudo, fromPseudo + "says hello");
+                    miniServer.sendToEveryoneElse(fromPseudo, fromPseudo + " says hello");
                     break;
                 case "list":
-                    miniServer.sendFromTo(fromPseudo, fromPseudo, miniServer.getAllPseudos());
+                    miniServer.sendFromTo(miniServer.getServerName(), fromPseudo, miniServer.getAllPseudos());
                     break;
                 default:
-                    miniServer.sendToEveryoneElse(fromPseudo, message);
+                    miniServer.sendToEveryone(fromPseudo, message);
                     break;
             }
         });
