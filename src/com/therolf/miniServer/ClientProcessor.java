@@ -35,10 +35,14 @@ public class ClientProcessor implements Runnable {
             pw = new PrintWriter(socket.getOutputStream(), true);
             br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-            while (!(Thread.currentThread().isInterrupted() || socket.isClosed())) {
-                System.out.println("socket opened");
+            while (!socket.isClosed()) {
+//                System.out.println(socket.isClosed() + " + " + socket.isConnected() + " + " + socket.isInputShutdown() + socket.isOutputShutdown());
                 if(br != null && br.ready()) {
                     String input = read();
+
+                    System.out.println(input);
+                    if(input.equals(Server.SHUTDOWN_COMMAND))
+                        socket.close();
 
                     // if user is not authed
                     if(pseudo == null) {
@@ -55,9 +59,7 @@ public class ClientProcessor implements Runnable {
                     } else {
                         // the user is authed
                         // decode its message
-
                         Message m = Message.fromString(input);
-
                         if(server.messageListener != null) {
                             server.messageListener.onMessageReceived(m.getPseudo(), m.getMessage());
                         }

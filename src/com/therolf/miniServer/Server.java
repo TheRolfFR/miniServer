@@ -9,6 +9,8 @@ import java.util.Arrays;
 
 public class Server {
 
+    public static final String SHUTDOWN_COMMAND = "hasta_la_vista";
+
     MessageListener messageListener;
     private ArrayList<ClientProcessor> clientProcessors = new ArrayList<>();
     private String serverName = "server";
@@ -56,6 +58,10 @@ public class Server {
 
         // empty pseudos not allowed
         if(pseudoToTest.equals(""))
+            return true;
+
+        // if pseudo is terminate commande
+        if(pseudoToTest.equals(SHUTDOWN_COMMAND))
             return true;
 
         // pseudo must be different from server name
