@@ -6,7 +6,7 @@ public class ServerExample {
     public static final int PORT = 1777;
 
     public ServerExample() {
-        Server miniServer = new Server(PORT, "serverExample");
+        Server miniServer = new Server(PORT, "serverExample", "192.168.1.66");
         miniServer.setMessageListener((fromPseudo, message) -> {
             switch (message) {
                 case "hello":

@@ -18,6 +18,7 @@ public class Server {
     private ArrayList<ClientProcessor> clientProcessors = new ArrayList<>();
     private String serverName = "server";
     private int port;
+    private String ip;
 
     public String getServerName() {
         return serverName;
@@ -30,18 +31,27 @@ public class Server {
     @SuppressWarnings("unused")
     public Server(int port) {
         this.port = port;
+        this.ip = "127.0.0.1";
     }
 
     public Server(int port, String serverName) {
         this.port = port;
         this.serverName = serverName;
+        this.ip = "127.0.0.1";
+    }
+
+    public Server(int port, String serverName, String ip) {
+        this.port = port;
+        this.serverName = serverName;
+        this.ip = ip;
     }
 
     public void run() {
         try {
+            InetAddress address = InetAddress.getByName(ip);
             System.out.println("=== Starting server ===");
-            ServerSocket servSocket = new ServerSocket(port, 100, InetAddress.getByName("127.0.0.1"));
-            System.out.println("=== Started server at " + servSocket.getInetAddress().getHostAddress() + ":" + port + " ===");
+            ServerSocket servSocket = new ServerSocket(port, 100, address);
+            System.out.println("=== Started server at " + address.getHostAddress() + ":" + port + " ===");
             System.out.println("=== Online address (if ports are opened) : " + getOnlineAddress() + ":" + port + " ===");
 
             //noinspection InfiniteLoopStatement
