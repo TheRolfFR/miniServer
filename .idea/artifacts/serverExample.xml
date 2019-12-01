@@ -1,7 +1,7 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="server">
-    <output-path>$PROJECT_DIR$/out/artifacts/server</output-path>
-    <root id="archive" name="server.jar">
+  <artifact type="jar" name="serverExample">
+    <output-path>$PROJECT_DIR$/out/artifacts/serverExample</output-path>
+    <root id="archive" name="serverExample.jar">
       <element id="module-output" name="MiniServer" />
       <element id="directory" name="META-INF">
         <element id="file-copy" path="$PROJECT_DIR$/ServerManifest/META-INF/MANIFEST.MF" />
