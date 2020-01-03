@@ -14,7 +14,7 @@ public class ServerExample {
         if(sc.hasNextLine())
             ip = sc.nextLine();
 
-        Server miniServer = new Server(PORT, "serverExample", ip);
+        Server miniServer = new Server(PORT, "SevenWonders", ip);
         miniServer.setMessageListener((fromPseudo, message) -> {
             switch (message) {
                 case "hello":

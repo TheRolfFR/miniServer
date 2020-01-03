@@ -41,6 +41,10 @@ public class ClientProcessor implements Runnable {
                     String input = read();
 
                     if(input.equals(Server.SHUTDOWN_COMMAND)) {
+                        if(pseudo != null && server.authListener != null) {
+                            --server.personsConnected;
+                            server.authListener.OnConnectionEnds(pseudo , server.personsConnected);
+                        }
                         socket.close();
                     } else if(pseudo == null) {
                         // if pseudo exist
@@ -50,6 +54,12 @@ public class ClientProcessor implements Runnable {
                         } else{
                             //change pseudo
                             pseudo = input;
+
+                            ++server.personsConnected;
+                            if(server.authListener != null) {
+                                server.authListener.OnNewConnection(pseudo, server.personsConnected);
+                            }
+
                             send(server.getServerName(), AUTH_COMPLETE_RESPONSE + pseudo);
                             System.out.println("connection successful with " + pseudo);
                         }

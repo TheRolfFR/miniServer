@@ -15,10 +15,18 @@ public class Server {
     public static final String SHUTDOWN_COMMAND = "hasta_la_vista";
 
     MessageListener messageListener;
+    AuthListener authListener;
+    int personsConnected;
     private ArrayList<ClientProcessor> clientProcessors = new ArrayList<>();
     private String serverName = "server";
     private int port;
     private String ip;
+    private int connectionsLimit = -1;
+
+    public void setConnectionsLimit(int connectionsLimit) {
+        if(connectionsLimit > 0)
+            this.connectionsLimit = connectionsLimit;
+    }
 
     public String getServerName() {
         return serverName;
@@ -26,6 +34,10 @@ public class Server {
 
     public void setMessageListener(MessageListener messageListener) {
         this.messageListener = messageListener;
+    }
+
+    public void setAuthListener(AuthListener authListener) {
+        this.authListener = authListener;
     }
 
     @SuppressWarnings("unused")
@@ -56,8 +68,10 @@ public class Server {
 
             //noinspection InfiniteLoopStatement
             while(true) {
-                Socket newClient = servSocket.accept();
-                clientProcessors.add(ClientProcessor.addNewProcessor(newClient, this));
+                if(personsConnected < connectionsLimit) {
+                    Socket newClient = servSocket.accept();
+                    clientProcessors.add(ClientProcessor.addNewProcessor(newClient, this));
+                }
             }
 
 //            servSocket.close();
@@ -175,5 +189,10 @@ public class Server {
 
     public interface MessageListener {
         void onMessageReceived(String pseudo, String message);
+    }
+
+    public interface AuthListener {
+        void OnNewConnection(String pseudo, int personsConnected);
+        void OnConnectionEnds(String pseudo, int personsConnected);
     }
 }
