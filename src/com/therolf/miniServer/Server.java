@@ -21,7 +21,7 @@ public class Server {
     private String serverName = "server";
     private int port;
     private String ip;
-    private int connectionsLimit = -1;
+    int connectionsLimit = -1;
 
     public void setConnectionsLimit(int connectionsLimit) {
         if(connectionsLimit > 0)

@@ -35,7 +35,7 @@ public class ClientProcessor implements Runnable {
             pw = new PrintWriter(socket.getOutputStream(), true);
             br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-            while (!socket.isClosed()) {
+            while ((server.connectionsLimit == -1 || server.personsConnected <= server.connectionsLimit) && !socket.isClosed()) {
 //                System.out.println(socket.isClosed() + " + " + socket.isConnected() + " + " + socket.isInputShutdown() + socket.isOutputShutdown());
                 if(br != null && br.ready()) {
                     String input = read();
